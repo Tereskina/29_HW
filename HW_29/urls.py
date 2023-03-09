@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from ads.views.ad import index
-from django_27_HW import settings
+from HW_29 import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),

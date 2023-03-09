@@ -11,7 +11,7 @@ poetry install
 
 Загрузить докер
 ```sh
-docker run --name 28-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
+docker run --name 29-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
 ```
 
 Добавить базу postgres:
@@ -26,10 +26,11 @@ Password: postgres
 
 Загрузить тестовые данные в базу
 ```sh
- python ./manage.py loaddata data/categories.json
- python ./manage.py loaddata data/ads.json
- python ./manage.py loaddata data/user.json
- python ./manage.py loaddata data/location.json
+python ./manage.py loaddata data/location.json
+python ./manage.py loaddata data/categories.json
+python ./manage.py loaddata data/user.json
+python ./manage.py loaddata data/ads.json
+
 
 ```
 
@@ -41,126 +42,21 @@ Password: postgres
 
 ### Задание
 
+# Шаг 0
+
+Подключите к проекту DRF, как мы это делали в уроке.
+
 # Шаг 1
 
-Из прошлого задания вы уже знаете, что у нас будут объявления и категории. А в этом уроке вы научились их связывать. 
-
-Но это еще не всё! Также в этой домашке мы добавим пользователей и их локации. 
-
-1. Используя знания из урока, подключите к вашему проекту PostgreSQL.
-2. Изучите предложенный вам [датасет](https://github.com/skypro-008/lesson28_project_sourse/tree/main/datasets), создайте по нему модели и загрузите данные в таблицы. HINT: некоторые модели и поля у вас уже есть, так что можно дописать только то, чего недостает. А вот данные придется удалить и залить заново.
-3. Не забудьте про админку! Ваши модели должны быть с русскими названиями, а в качестве ссылки на запись должны отображаться:
-    1. для категории — `name`,
-    2. для локации — `name`,
-    3. для пользователя — `username`,
-    4. для объявления — `name.`
-    
-    HINT: Мы обсуждали, как это делается, в уроке 27, часть 2.
-    
+Перепишите создание пользователей на GenericView из DRF. И не забудьте сохранить пагинацию в  списке!
 
 # Шаг 2
 
-Перепишите свои View на наследников ListView, DetailView и CreateView (в зависимости от назначения каждой из них) и реализуйте недостающие для категорий и объявлений методы: 
-
-- для  `/cat/:id` — методы PATCH/DELETE,
-- для `/ad/:id` — методы PATCH/DELETE.
+Напишите ViewSet для модели Location.
 
 ```json
 Request
-PATCH /cat/1/update/
-
-{
-	"name": "Молочная продукция"
-}
-
-Response
-200
-{
-	"id": 1,
-	"name": "Молочная продукция"
-}
-
-Request
-PATCH /ad/1/update/
-{
-	"name": "Толстовка",
-	"author_id": 1,
-	"price": 500,
-	"description": "Продаю кофту на рост 115 см по всем вопросам пишите", 
-	"category_id": 1
-}
-
-Response
-200
-{
-	"id": 1,
-	"name": "Толстовка",
-	"author_id": 1,
-	"author": "Мария",
-	"price": 500,
-	"description": "Продаю кофту на рост 115 см по всем вопросам пишите", 
-	"is_published": True,
-	"category_id": 1,
-	"image": "ads/image.png"
-}
-
-Request
-DELETE /cat/1/delete/
-
-Response
-{
-	"status": "ok"
-}
-
-Request
-DELETE /ad/1/delete/
-
-Response
-{
-	"status": "ok"
-}
-```
-
-После этого список `urlpatterns` станет достаточно большим, так что если вы храните его в главном файле `[urls.py](http://urls.py)`, то создайте в своем приложении еще один и перенести все URL приложения в него, как мы делали это на уроке.
-
-И не забудьте добавить отображение новых полей во view для объявлений!
-
-# Шаг 3
-
-Добавьте URL `/ad/1/upload_image` для загрузки картинок к объявлениям аналогично тому, как мы делали это в уроке.
-
-Должно получиться вот так:
-
-```json
-Request
-POST /ad/1/upload_image/
-ContentType 'multipart/form-data'
-FILES: "image" 
-
-Response
-200
-{
-	"id": 1,
-	"name": "Толстовка",
-	"author_id": 1,
-	"author": "Мария",
-	"price": 500,
-	"description": "Продаю кофту на рост 115 см по всем вопросам пишите"
-	"is_published": True,
-	"category_id": 1,
-	"image": "ads/image.png"
-} 
-```
-
-Кстати, для записей, которые у вас уже лежа в базе у нас есть [картинки](https://github.com/skypro-008/PD_008_course5/tree/main/images). Потренироваться с отображением можно на них.
-
-# Шаг 4
-
-Добавьте пагинацию в отображение списков объявлений. У вас должно получиться следующее: 
-
-```json
-Request
-GET /ad/
+GET /location/
 
 Response
 200
@@ -168,16 +64,107 @@ Response
 	"items":
 		[
 			{
-					"id": 1,
-					"name": "Толстовка",
-					"author_id": 1,
-					"author": "Мария",
-					"price": 500,
-					"description": "Продаю кофту на рост 115 см по всем вопросам пишите",
-					"is_published": True,
-					"category_id": 1,
-					"image": "ads/image.png"
-			} 
+				"id": 1,
+				"name": "Москва",
+				"lat": 52.456734,
+				"lng": 49.235543,
+			},
+			...
+		],
+	"next": null,
+  "previous": null,
+	"count": 4,
+}
+
+Request
+GET /location/1/
+
+Response
+200
+{
+	"id": 1,
+	"name": "Москва",
+	"lat": 52.456734,
+	"lng": 49.235543,
+}
+
+404
+{
+    "detail": "Not found."
+}
+
+Request
+POST /location/
+{
+	"name": "Москва, м. Автозаводская",
+	"lat": 52.456734,
+	"lng": 49.235543,
+}
+
+Response
+200
+{
+    "id": 5,
+    "name": "Москва, м. Автозаводская",
+    "lat": "52.456734",
+    "lng": "49.235543"
+}
+
+400
+{"name":["This field is required."]}
+
+Request
+PATCH /location/1/
+{
+	"name": "Москва, м. Автозаводская",
+	"lat": 52.456734,
+	"lng": 49.235543,
+}
+
+Response
+200
+{
+	"id": 1,
+	"name": "Москва, м. Автозаводская"
+	"lat": 52.456734,
+	"lng": 49.235543,
+}
+
+400
+{"name":["This field is required."]}
+
+Request
+DELETE /location/1/
+
+Response
+204
+```
+
+# Шаг 3
+
+Теперь можно приступать к поиску. Поиск будет для объявлений и фильтров будет несколько, поэтому давайте разобьем их по шагам.
+
+## Шаг 1
+
+Первое, что всегда встречается в маркетплейсах - умение отдавать объявления по категориям. 
+
+Для этого, реализуйте возможность следующего запроса, который возвращает все объявления в переданных ему категориях (в нашем примере все объявления с category_id=1 или category_id=2):
+
+```json
+Request
+GET /ad?cat=1/
+
+Response
+200
+{
+	"items":
+		[
+			{
+				"id": 1,
+				"name": "Толстовка",
+				"author": "Мария",
+				"price": 500,
+			},
 			...
 		]
 	"total": 20,
@@ -185,15 +172,13 @@ Response
 } 
 ```
 
-# Шаг 5
+## Шаг 2
 
-Реализуйте CRUD для пользователей. Не забудьте сделать добавление локации при создании и редактировании профиля, чтобы пользователи не мучались.
-
-NOTE: подумайте, так ли сильно связаны пользователи с объявлениями? или они могут жить отдельно?
+Следующее, что нам точно надо - это поиск по словам. Причем не просто по слову, а по вхождению слова в название. Для этого у нас есть следующая спецификация: 
 
 ```json
 Request
-GET /user/
+GET /ad?text="Толстов"/
 
 Response
 200
@@ -202,116 +187,30 @@ Response
 		[
 			{
 				"id": 1,
-				"username": "palexandrov",
-				"first_name": "Павел",
-				"last_name": "Александров",
-				"role": "member",
-				"age": 18,
-				"locations": [
-						"Москва",  # поле name из location
-				]
+				"name": "Толстовка",
+				"author": "Мария",
+				"price": 500,
+			},
+			{
+				"id": 2,
+				"name": "Продаю толстовку",
+				"author": "Анна",
+				"price": 1000,
 			},
 			...
-		],
+		]
 	"total": 20,
 	"num_pages": 10
-}
-
-Request
-GET /user/1/
-
-Response
-200
-{
-	"id": 1,
-	"username": "palexandrov",
-	"first_name": "Павел",
-	"last_name": "Александров",
-	"role": "member",
-	"age": 18,
-	"locations": [
-			"Москва",  # поле name из location
-	]
-}
-
-404
-
-Request
-POST /user/create/
-{
-	"username": "palexandrov",
-	"password": "password",
-	"first_name": "Павел",
-	"last_name": "Александров",
-	"role": "member",
-	"age": 18,
-  "locations": ["Москва", "м. Авиастроительная"]
-}
-
-Response
-200
-{
-	"id": 1,
-	"username": "palexandrov",
-	"first_name": "Павел",
-	"last_name": "Александров",
-	"role": "member",
-	"age": 18,
-	"locations": [
-			"Москва",  # поле name из location
-			"м. Авиастроительная"
-	]
-}
-
-Request
-PATCH /user/1/update/
-{
-	"username": "palexandrov",
-	"password": "password",
-	"first_name": "Павел",
-	"last_name": "Александров",
-	"age": 18,
-  "locations": ["Москва", "м. Авиастроительная"]
-}
-
-Response
-200
-{
-	"id": 1,
-	"username": "palexandrov",
-	"first_name": "Павел",
-	"last_name": "Александров",
-	"age": 18,
-	"locations": [
-			"Москва",  # поле name из location
-			"м. Авиастроительная"
-	]
-}
-
-Request
-DELETE /user/1/delete/
-
-Response
-{
-	"status": "ok"
-}
+} 
 ```
 
-# Шаг 6
+## Шаг 3
 
-Давайте еще добавим сортировок: 
-
-- для пользователей: пользователи должны по умолчанию сортироваться по полю `username` (по алфавиту);
-- для объявлений: только при выдаче списка объявлений сортируйте их по убыванию цены (сначала самые дорогие);
-- для категорий: только при выдаче списка категорий сортируйте их по полю `name` (по алфавиту).
-
-# Шаг 7
-
-Добавьте в список пользователей поле с количеством опубликованных пользователем объявлений (`is_published=True`). Должно получиться вот так:
+Еще у нас достаточно широкая география, так что хотелось бы выбрать из всех объявлений только релевантные нам по месту. Спецификация следующая: 
 
 ```json
 Request
-GET /user/Z 
+GET /ad?location=Москва/
 
 Response
 200
@@ -320,35 +219,58 @@ Response
 		[
 			{
 				"id": 1,
-				"username": "palexandrov",
-				"first_name": "Павел",
-				"last_name": "Александров",
-				"role": "member",
-				"age": 18,
-				"location": "Москва",  # поле name из location
-				"total_ads": 10,
+				"name": "Толстовка",
+				"author": "Мария",
+				"price": 500,
 			},
 			...
-		],
+		]
 	"total": 20,
-	"per_page": 10
-}
+	"num_pages": 10
+} 
+```
+
+NOTE: название локации возьмите из модели User, привязанной к объявлению и предусмотрите поиск по вхождению подстроки без учета регистра.
+
+## Шаг 4
+
+И еще один фильтр: было бы неплохо задать диапазон цен, в котором мы готовы рассматривать товары. Давайте сделаем это так: 
+
+```json
+Request
+GET /ad?price_from=100&price_to=1000/
+
+Response
+200
+{
+	"items":
+		[
+			{
+				"id": 1,
+				"name": "Толстовка",
+				"author": "Мария",
+				"price": 500,
+			},
+			{
+				"id": 2,
+				"name": "Продаю толстовку",
+				"author": "Анна",
+				"price": 999,
+			},
+			...
+		]
+	"total": 20,
+	"num_pages": 10
+} 
 ```
 
 **Критерии выполнения:**
 
-- [ ]  В проекте подключен PostgreSQL.
-- [ ]  В моделях есть все поля из CSV.
-- [ ]  В моделях используются ForeignKey и ManyToManyField.
-- [ ]  Во всех моделях определен `class Meta` и переопределен метод `__str__`.
-- [ ]  Картинки, прикрепленные к объявлениям, корректно открываются.
-- [ ]  Использованы ListView, DetailView, CreateView, UpdateView, DeleteView.
-- [ ]  Типы данных в JSON отдаются корректно.
-- [ ]  Методы из спецификации работают.
-- [ ]  Используются атрибут `ordering` и метод `order_by`.
-- [ ]  В списках пользователей и объявлений есть пагинация.
-- [ ]  Локации могут формироваться прямо в методах создания и редактирования пользователей.
-- [ ]  Используется хотя бы один из методов `aggregate` / `annotate`.
-- [ ]  Используется метод `select_relation`.
-- [ ]  Используются методы `get_or_create`, `get_object_or_404`.
-- [ ]  URL разнесены по разным директориям.
+- [ ]  Работа с пользователями реализованая через GenericView из DRF - ListApiView, RetrieveAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
+- [ ]  При выводе списка пользователей используется встроенная пагинация DRF
+- [ ]  API для модели Location реализовано с использованием ViewSet и Router
+- [ ]  В проекте используются Serializers
+- [ ]  Все фильтры выполнены с использованием lookup's
+- [ ]  Типы данных в JSON отдаются корректно
+- [ ]  Методы из спецификации работают
+- 
