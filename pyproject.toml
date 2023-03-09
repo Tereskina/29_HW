@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "django-27-hw"
+version = "0.1.0"
+description = ""
+authors = ["Tereskina <iv.kseni2@gmail.com>"]
+readme = "README.md"
+packages = [{include = "django_27_hw"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django = "^4.1.7"
+psycopg2 = "^2.9.5"
+pillow = "^9.4.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
