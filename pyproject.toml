@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "django-27-hw"
+name = "29_HW"
 version = "0.1.0"
 description = ""
 authors = ["Tereskina <iv.kseni2@gmail.com>"]
 readme = "README.md"
-packages = [{include = "django_27_hw"}]
+
 
 [tool.poetry.dependencies]
 python = "^3.10"
