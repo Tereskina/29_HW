@@ -18,18 +18,18 @@ from django.contrib import admin
 from django.urls import path, include
 
 from ads.views.ad import index
-from django_27_HW import settings
+from HW_29 import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index),
-
     path('ad/', include('ads.urls.ad')),
     path('cat/', include('ads.urls.category')),
-    path('user/', include('users.urls'))
+    path('user/', include('users.urls.user')),
+    path('location/', include('users.urls.locations')),
 
 ]
 
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
